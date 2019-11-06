@@ -1,5 +1,20 @@
 <?php
 
+/**
+ * Copyright 2019 Huawei Technologies Co.,Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+ * this file except in compliance with the License.  You may obtain a copy of the
+ * License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations under the License.
+ *
+ */
+
 namespace Obs\Internal\Common;
 
 use GuzzleHttp\Exception\RequestException;
@@ -12,21 +27,10 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 
-/**
- * HTTP handler that uses PHP's HTTP stream wrapper.
- */
 class SdkStreamHandler
 {
     private $lastHeaders = [];
 
-    /**
-     * Sends an HTTP request.
-     *
-     * @param RequestInterface $request Request to send.
-     * @param array            $options Request transfer options.
-     *
-     * @return PromiseInterface
-     */
     public function __invoke(RequestInterface $request, array $options)
     {
         if (isset($options['delay'])) {
@@ -71,7 +75,8 @@ class SdkStreamHandler
         $startTime,
         ResponseInterface $response = null,
         $error = null
-    ) {
+    )
+    {
         if (isset($options['on_stats'])) {
             $stats = new TransferStats(
                 $request,
@@ -89,7 +94,8 @@ class SdkStreamHandler
         array $options,
         $stream,
         $startTime
-    ) {
+    )
+    {
         $hdrs = $this->lastHeaders;
         $this->lastHeaders = [];
         $parts = explode(' ', array_shift($hdrs), 3);
@@ -162,7 +168,7 @@ class SdkStreamHandler
                         $headers['x-encoded-content-length']
                             = $headers[$normalizedKeys['content-length']];
 
-                        $length = (int) $stream->getSize();
+                        $length = (int)$stream->getSize();
                         if ($length === 0) {
                             unset($headers[$normalizedKeys['content-length']]);
                         } else {
@@ -176,26 +182,16 @@ class SdkStreamHandler
         return [$stream, $headers];
     }
 
-    /**
-     * Drains the source stream into the "sink" client option.
-     *
-     * @param StreamInterface $source
-     * @param StreamInterface $sink
-     * @param string          $contentLength Header specifying the amount of
-     *                                       data to read.
-     *
-     * @return StreamInterface
-     * @throws \RuntimeException when the sink option is invalid.
-     */
     private function drain(
         StreamInterface $source,
         StreamInterface $sink,
         $contentLength
-    ) {
+    )
+    {
         Psr7\copy_to_stream(
             $source,
             $sink,
-            (strlen($contentLength) > 0 && (int) $contentLength > 0) ? (int) $contentLength : -1
+            (strlen($contentLength) > 0 && (int)$contentLength > 0) ? (int)$contentLength : -1
         );
 
         $sink->seek(0);
@@ -204,22 +200,14 @@ class SdkStreamHandler
         return $sink;
     }
 
-    /**
-     * Create a resource and check to ensure it was created successfully
-     *
-     * @param callable $callback Callable that returns stream resource
-     *
-     * @return resource
-     * @throws \RuntimeException on error
-     */
     private function createResource(callable $callback)
     {
         $errors = null;
         set_error_handler(function ($_, $msg, $file, $line) use (&$errors) {
             $errors[] = [
                 'message' => $msg,
-                'file'    => $file,
-                'line'    => $line
+                'file' => $file,
+                'line' => $line
             ];
             return true;
         });
@@ -302,12 +290,12 @@ class SdkStreamHandler
 
         return $this->createResource(
             function () use ($uri, &$http_response_header, $context, $options) {
-                $resource = fopen((string) $uri, 'r', null, $context);
+                $resource = fopen((string)$uri, 'r', null, $context);
                 $this->lastHeaders = $http_response_header;
 
                 if (isset($options['read_timeout'])) {
                     $readTimeout = $options['read_timeout'];
-                    $sec = (int) $readTimeout;
+                    $sec = (int)$readTimeout;
                     $usec = ($readTimeout - $sec) * 100000;
                     stream_set_timeout($resource, $sec, $usec);
                 }
@@ -351,15 +339,15 @@ class SdkStreamHandler
 
         $context = [
             'http' => [
-                'method'           => $request->getMethod(),
-                'header'           => $headers,
+                'method' => $request->getMethod(),
+                'header' => $headers,
                 'protocol_version' => $request->getProtocolVersion(),
-                'ignore_errors'    => true,
-                'follow_location'  => 0,
+                'ignore_errors' => true,
+                'follow_location' => 0,
             ],
         ];
 
-        $body = (string) $request->getBody();
+        $body = (string)$request->getBody();
 
         if (!empty($body)) {
             $context['http']['content'] = $body;
@@ -456,16 +444,16 @@ class SdkStreamHandler
         }
 
         static $map = [
-            STREAM_NOTIFY_CONNECT       => 'CONNECT',
+            STREAM_NOTIFY_CONNECT => 'CONNECT',
             STREAM_NOTIFY_AUTH_REQUIRED => 'AUTH_REQUIRED',
-            STREAM_NOTIFY_AUTH_RESULT   => 'AUTH_RESULT',
-            STREAM_NOTIFY_MIME_TYPE_IS  => 'MIME_TYPE_IS',
-            STREAM_NOTIFY_FILE_SIZE_IS  => 'FILE_SIZE_IS',
-            STREAM_NOTIFY_REDIRECTED    => 'REDIRECTED',
-            STREAM_NOTIFY_PROGRESS      => 'PROGRESS',
-            STREAM_NOTIFY_FAILURE       => 'FAILURE',
-            STREAM_NOTIFY_COMPLETED     => 'COMPLETED',
-            STREAM_NOTIFY_RESOLVE       => 'RESOLVE',
+            STREAM_NOTIFY_AUTH_RESULT => 'AUTH_RESULT',
+            STREAM_NOTIFY_MIME_TYPE_IS => 'MIME_TYPE_IS',
+            STREAM_NOTIFY_FILE_SIZE_IS => 'FILE_SIZE_IS',
+            STREAM_NOTIFY_REDIRECTED => 'REDIRECTED',
+            STREAM_NOTIFY_PROGRESS => 'PROGRESS',
+            STREAM_NOTIFY_FAILURE => 'FAILURE',
+            STREAM_NOTIFY_COMPLETED => 'COMPLETED',
+            STREAM_NOTIFY_RESOLVE => 'RESOLVE',
         ];
         static $args = ['severity', 'message', 'message_code',
             'bytes_transferred', 'bytes_max'];

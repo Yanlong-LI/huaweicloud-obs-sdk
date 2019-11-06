@@ -30,4 +30,4 @@ $resp = $obsClient->putObject([
 var_dump($resp);
 
 // 关闭obsClient
-$obsClient -> close();
+$obsClient->close();

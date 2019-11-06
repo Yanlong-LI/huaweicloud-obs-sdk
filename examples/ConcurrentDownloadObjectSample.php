@@ -1,6 +1,21 @@
 <?php
 
 /**
+ * Copyright 2019 Huawei Technologies Co.,Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+ * this file except in compliance with the License.  You may obtain a copy of the
+ * License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations under the License.
+ *
+ */
+
+/**
  * This sample demonstrates how to download an object concurrently
  * from OBS using the OBS SDK for PHP.
  */
@@ -34,12 +49,12 @@ $localFilePath = '/temp/' . $objectKey;
 /*
  * Constructs a obs client instance with your account for accessing OBS
  */
-$obsClient = ObsClient::factory([ 
-        'key' => $ak,
-        'secret' => $sk,
-        'endpoint' => $endpoint,
-        'socket_timeout' => 30,
-        'connect_timeout' => 10
+$obsClient = ObsClient::factory([
+    'key' => $ak,
+    'secret' => $sk,
+    'endpoint' => $endpoint,
+    'socket_timeout' => 30,
+    'connect_timeout' => 10
 ]);
 
 try {
@@ -47,30 +62,30 @@ try {
      * Create bucket
      */
     printf("Create a new bucket for demo\n\n");
-    $obsClient->createBucket([ 
-            'Bucket' => $bucketName
+    $obsClient->createBucket([
+        'Bucket' => $bucketName
     ]);
 
     $sampleFilePath = '/temp/test.txt'; // sample large file path
-                                        // you can prepare a large file in you filesystem first
+    // you can prepare a large file in you filesystem first
     createSampleFile($sampleFilePath);
 
     /*
      * Upload an object to your bucket
      */
     printf("Uploading a new object to OBS from a file\n\n");
-    $obsClient->putObject([ 
-            'Bucket' => $bucketName,
-            'Key' => $objectKey,
-            'SourceFile' => $sampleFilePath
+    $obsClient->putObject([
+        'Bucket' => $bucketName,
+        'Key' => $objectKey,
+        'SourceFile' => $sampleFilePath
     ]);
 
     /*
      * Get size of the object and pre-create a random access file to hold object data
      */
-    $resp = $obsClient->getObjectMetadata([ 
-            'Bucket' => $bucketName,
-            'Key' => $objectKey
+    $resp = $obsClient->getObjectMetadata([
+        'Bucket' => $bucketName,
+        'Key' => $objectKey
     ]);
 
     $objectSize = $resp ['ContentLength'];
@@ -78,7 +93,7 @@ try {
     printf("Object size from metadata:%d\n\n", $objectSize);
 
     $dir = dirname($localFilePath);
-    if (! is_dir($dir)) {
+    if (!is_dir($dir)) {
         mkdir($dir, 0755, true);
     }
 
@@ -89,7 +104,7 @@ try {
     $blockCount = intval($objectSize / $blockSize);
 
     if ($objectSize % $blockSize !== 0) {
-        $blockCount ++;
+        $blockCount++;
     }
 
     printf("Total blocks count:%d\n\n", $blockCount);
@@ -102,23 +117,23 @@ try {
     $fp = fopen($localFilePath, 'w');
     $promise = null;
 
-    for($i = 0; $i < $blockCount;) {
-        $startPos = $i ++ * $blockSize;
+    for ($i = 0; $i < $blockCount;) {
+        $startPos = $i++ * $blockSize;
         $endPos = ($i == $blockCount) ? $objectSize - 1 : ($i * $blockSize - 1);
         $range = sprintf('bytes=%d-%d', $startPos, $endPos);
-        $p = $obsClient->getObjectAsync([ 
-                'Bucket' => $bucketName,
-                'Key' => $objectKey,
-                'Range' => $range
+        $p = $obsClient->getObjectAsync([
+            'Bucket' => $bucketName,
+            'Key' => $objectKey,
+            'Range' => $range
         ], function ($exception, $resp) use ($startPos, $fp, $i, $range) {
             fseek($fp, $startPos, 0);
             printf("%s\n", $range);
             try {
-                while ( ! $resp ['Body']->eof() ) {
+                while (!$resp ['Body']->eof()) {
                     $str = $resp ['Body']->read(65536);
                     fwrite($fp, $str);
                 }
-            } catch ( Exception $exception ) {
+            } catch (Exception $exception) {
                 printf($exception);
             }
             $resp ['Body']->close();
@@ -142,21 +157,22 @@ try {
      * Deleting object
      */
     printf("Deleting object %s \n\n", $objectKey);
-    $obsClient->deleteObject([ 
-            'Bucket' => $bucketName,
-            'Key' => $objectKey
+    $obsClient->deleteObject([
+        'Bucket' => $bucketName,
+        'Key' => $objectKey
     ]);
-} catch ( ObsException $e ) {
+} catch (ObsException $e) {
     echo 'Response Code:' . $e->getStatusCode() . PHP_EOL;
     echo 'Error Message:' . $e->getExceptionMessage() . PHP_EOL;
     echo 'Error Code:' . $e->getExceptionCode() . PHP_EOL;
     echo 'Request ID:' . $e->getRequestId() . PHP_EOL;
     echo 'Exception Type:' . $e->getExceptionType() . PHP_EOL;
-} finally{
+} finally {
     $obsClient->close();
 }
 
-function createSampleFile($filePath) {
+function createSampleFile($filePath)
+{
     if (file_exists($filePath)) {
         return;
     }
@@ -165,13 +181,13 @@ function createSampleFile($filePath) {
         $fp = null;
         $dir = dirname($filePath);
         try {
-            if (! is_dir($dir)) {
+            if (!is_dir($dir)) {
                 mkdir($dir, 0755, true);
             }
 
             if (($fp = fopen($filePath, 'w'))) {
 
-                for($i = 0; $i < 1000000; $i ++) {
+                for ($i = 0; $i < 1000000; $i++) {
                     fwrite($fp, uniqid() . "\n");
                     fwrite($fp, uniqid() . "\n");
                     if ($i % 100 === 0) {
@@ -179,7 +195,7 @@ function createSampleFile($filePath) {
                     }
                 }
             }
-        } finally{
+        } finally {
             if ($fp) {
                 fclose($fp);
             }
