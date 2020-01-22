@@ -2,7 +2,7 @@
   "name": "non0/huaweicloud-obs-sdk",
   "description": "华为云对象储存SDK FOR PHP",
   "license": "Apache-2.0",
-  "version": "3.19.9",
+  "version": "3.20.1",
   "require": {
     "php": ">=5.6.0",
     "guzzlehttp/guzzle": "^6.3.0",
