@@ -17,15 +17,15 @@
 
 namespace Obs\Internal\Signature;
 
-use Obs\Log\ObsLog;
-use Obs\Internal\Resource\Constants;
-use Obs\ObsException;
-use Obs\Internal\Common\SchemaFormatter;
 use GuzzleHttp\Psr7\Stream;
 use Obs\Internal\Common\Model;
-use Psr\Http\Message\StreamInterface;
 use Obs\Internal\Common\ObsTransform;
+use Obs\Internal\Common\SchemaFormatter;
 use Obs\Internal\Common\V2Transform;
+use Obs\Internal\Resource\Constants;
+use Obs\Log\ObsLog;
+use Obs\ObsException;
+use Psr\Http\Message\StreamInterface;
 
 abstract class AbstractSignature implements SignatureInterface
 {
@@ -279,9 +279,9 @@ abstract class AbstractSignature implements SignatureInterface
                             if (is_array($val)) {
                                 $sentAs = strtolower($value['sentAs']);
                                 foreach ($val as $k => $v) {
-                                    $k = strtolower($k);
+                                    $k = self::urlencodeWithSafe(strtolower($k), ' ;/?:@&=+$,');
                                     $name = strpos($k, $sentAs) === 0 ? $k : $sentAs . $k;
-                                    $headers[$name] = self::urlencodeWithSafe($v);
+                                    $headers[$name] = self::urlencodeWithSafe($v, ' ;/?:@&=+$,\'*');
                                 }
                             }
                         } else if ($type === 'array') {
@@ -290,7 +290,7 @@ abstract class AbstractSignature implements SignatureInterface
                                 $temp = [];
                                 foreach ($val as $v) {
                                     if (($v = strval($v)) !== '') {
-                                        $temp[] = self::urlencodeWithSafe($v);
+                                        $temp[] = self::urlencodeWithSafe($val, ' ;/?:@&=+$,\'*');
                                     }
                                 }
                                 $headers[$name] = $temp;
@@ -319,7 +319,7 @@ abstract class AbstractSignature implements SignatureInterface
                                     if (isset($value['format'])) {
                                         $val = SchemaFormatter::format($value['format'], $val);
                                     }
-                                    $headers[$name] = self::urlencodeWithSafe($val);
+                                    $headers[$name] = self::urlencodeWithSafe($val, ' ;/?:@&=+$,\'*');
                                 }
                             }
                         }
@@ -444,6 +444,8 @@ abstract class AbstractSignature implements SignatureInterface
         if ($this->securityToken) {
             $headers[$constants::SECURITY_TOKEN_HEAD] = $this->securityToken;
         }
+
+        $headers['Host'] = $host;
 
         $result['host'] = $host;
         $result['method'] = $method;

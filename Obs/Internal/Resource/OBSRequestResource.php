@@ -42,12 +42,14 @@ class OBSRequestResource
                     ],
                     'LocationConstraint' => [
                         'type' => 'string',
-                        'location' => 'xml'
+                        'location' => 'xml',
+                        'sentAs' => 'Location'
                     ],
                     'StorageClass' => [
                         'type' => 'string',
                         'location' => 'header',
-                        'sentAs' => 'x-obs-storage-class'
+                        'sentAs' => 'x-obs-storage-class',
+                        'transform' => 'storageClass'
                     ]
                 ],
                 'responseParameters' => [
@@ -621,6 +623,7 @@ class OBSRequestResource
                         'required' => true,
                         'type' => 'string',
                         'location' => 'xml',
+                        'transform' => 'storageClass',
                         'data' => [
                             'xmlFlattened' => true
                         ]
@@ -1070,7 +1073,8 @@ class OBSRequestResource
                                         'sentAs' => 'Transition',
                                         'properties' => [
                                             'StorageClass' => [
-                                                'type' => 'string'
+                                                'type' => 'string',
+                                                'transform' => 'storageClass'
                                             ],
                                             'Date' => [
                                                 'type' => 'string',
@@ -1105,7 +1109,8 @@ class OBSRequestResource
                                         'sentAs' => 'NoncurrentVersionTransition',
                                         'properties' => [
                                             'StorageClass' => [
-                                                'type' => 'string'
+                                                'type' => 'string',
+                                                'transform' => 'storageClass'
                                             ],
                                             'NoncurrentDays' => [
                                                 'type' => 'numeric'
@@ -2700,7 +2705,8 @@ class OBSRequestResource
                     'StorageClass' => [
                         'type' => 'string',
                         'location' => 'header',
-                        'sentAs' => 'x-obs-storage-class'
+                        'sentAs' => 'x-obs-storage-class',
+                        'transform' => 'storageClass'
                     ],
                     'Body' => [
                         'type' => 'stream',
@@ -3073,7 +3079,8 @@ class OBSRequestResource
                     'StorageClass' => [
                         'type' => 'string',
                         'location' => 'header',
-                        'sentAs' => 'x-obs-storage-class'
+                        'sentAs' => 'x-obs-storage-class',
+                        'transform' => 'storageClass'
                     ],
                     'Bucket' => [
                         'required' => true,
@@ -3386,7 +3393,8 @@ class OBSRequestResource
                     'StorageClass' => [
                         'type' => 'string',
                         'location' => 'header',
-                        'sentAs' => 'x-obs-storage-class'
+                        'sentAs' => 'x-obs-storage-class',
+                        'transform' => 'storageClass'
                     ],
                     'Bucket' => [
                         'required' => true,

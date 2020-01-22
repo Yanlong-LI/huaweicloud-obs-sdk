@@ -16,8 +16,8 @@
 
 namespace Obs\Internal\Common;
 
-use Obs\ObsClient;
 use Obs\Internal\Resource\V2Constants;
+use Obs\ObsClient;
 
 class V2Transform implements ITransform
 {

@@ -17,9 +17,9 @@
 
 namespace Obs\Internal\Common;
 
-use Psr\Http\Message\StreamInterface;
 use GuzzleHttp\Psr7\StreamDecoratorTrait;
 use Obs\ObsException;
+use Psr\Http\Message\StreamInterface;
 
 class CheckoutStream implements StreamInterface
 {

@@ -17,11 +17,11 @@
 
 namespace Obs\Internal\Common;
 
+use GuzzleHttp\Handler\CurlFactoryInterface;
+use GuzzleHttp\Handler\EasyHandle;
 use GuzzleHttp\Psr7;
 use GuzzleHttp\Psr7\LazyOpenStream;
 use Psr\Http\Message\RequestInterface;
-use GuzzleHttp\Handler\CurlFactoryInterface;
-use GuzzleHttp\Handler\EasyHandle;
 
 class SdkCurlFactory implements CurlFactoryInterface
 {

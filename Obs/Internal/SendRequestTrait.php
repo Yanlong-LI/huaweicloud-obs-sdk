@@ -17,21 +17,20 @@
 
 namespace Obs\Internal;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7;
-use Obs\Log\ObsLog;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
-use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Exception\ConnectException;
 use Obs\Internal\Common\Model;
-use Obs\Internal\Resource\V2Constants;
-use Obs\ObsException;
-use Obs\Internal\Signature\V4Signature;
-use Obs\Internal\Signature\DefaultSignature;
-use GuzzleHttp\Client;
 use Obs\Internal\Resource\Constants;
+use Obs\Internal\Resource\V2Constants;
+use Obs\Internal\Signature\DefaultSignature;
+use Obs\Internal\Signature\V4Signature;
+use Obs\Log\ObsLog;
+use Obs\ObsException;
 use Psr\Http\Message\StreamInterface;
-use Obs\Internal\Resource\V2RequestResource;
 
 trait SendRequestTrait
 {
@@ -610,13 +609,12 @@ trait SendRequestTrait
         }
 
         $promise = $this->httpClient->sendAsync($request, ['stream' => $saveAsStream])->then(
-            function (Response $response) use ($model, $operation, $params, $request, $start) {
+            function (Response $response) use ($model, $operation, $params, $request, $requestCount, $start) {
 
                 ObsLog::commonLog(INFO, 'http request cost ' . round(microtime(true) - $start, 3) * 1000 . ' ms');
-
                 $statusCode = $response->getStatusCode();
                 $readable = isset($params['Body']) && ($params['Body'] instanceof StreamInterface || is_resource($params['Body']));
-                if ($statusCode === 307 && !$readable) {
+                if ($statusCode >= 300 && $statusCode < 400 && $statusCode !== 304 && !$readable && $requestCount <= $this->maxRetryCount) {
                     if ($location = $response->getHeaderLine('location')) {
                         $url = parse_url($this->endpoint);
                         $newUrl = parse_url($location);

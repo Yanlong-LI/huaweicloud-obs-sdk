@@ -31,9 +31,9 @@ if (file_exists('obs-autoloader.php')) {
     require '../obs-autoloader.php'; // sample env
 }
 
-use Obs\ObsClient;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
+use Obs\ObsClient;
 
 $ak = '*** Provide your Access Key ***';
 

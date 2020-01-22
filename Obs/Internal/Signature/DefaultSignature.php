@@ -18,9 +18,8 @@
 namespace Obs\Internal\Signature;
 
 
-use Obs\Internal\Resource\Constants;
 use Obs\Internal\Common\Model;
-use Obs\Internal\Resource\V2Constants;
+use Obs\Internal\Resource\Constants;
 
 class DefaultSignature extends AbstractSignature
 {

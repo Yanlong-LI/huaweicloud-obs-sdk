@@ -17,15 +17,15 @@
 
 namespace Obs\Internal;
 
+use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
-use GuzzleHttp\Exception\RequestException;
-use Obs\ObsException;
+use Obs\Internal\Common\CheckoutStream;
 use Obs\Internal\Common\Model;
 use Obs\Internal\Resource\Constants;
 use Obs\Log\ObsLog;
+use Obs\ObsException;
 use Psr\Http\Message\StreamInterface;
-use Obs\Internal\Common\CheckoutStream;
 
 trait GetResponseTrait
 {
@@ -145,7 +145,8 @@ trait GetResponseTrait
                                 $temp = [];
                                 foreach ($headers as $headerName => $headerValue) {
                                     if (stripos($headerName, $name) === 0) {
-                                        $temp[substr($headerName, strlen($name))] = rawurldecode($response->getHeaderLine($headerName));
+                                        $metaKey = rawurldecode(substr($headerName, strlen($name)));
+                                        $temp[$metaKey] = rawurldecode($response->getHeaderLine($headerName));
                                     }
                                 }
                                 $model[$key] = $temp;
@@ -166,7 +167,7 @@ trait GetResponseTrait
                             }
                         }
                         if (!$isSet) {
-                            $model[$key] = $response->getHeaderLine($name);
+                            $model[$key] = rawurldecode($response->getHeaderLine($name));
                         }
                     } else if ($location === 'xml' && $body !== null) {
                         if (!isset($xml) && ($xml = simplexml_load_string($body->getContents()))) {

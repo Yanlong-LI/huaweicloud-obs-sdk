@@ -17,18 +17,17 @@
 
 namespace Obs;
 
-use Obs\Log\ObsLog;
-use Obs\Internal\Common\SdkCurlFactory;
-use Obs\Internal\Common\SdkStreamHandler;
-use Obs\Internal\Common\Model;
-use Monolog\Logger;
 use GuzzleHttp\Client;
-use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Handler\CurlHandler;
 use GuzzleHttp\Handler\CurlMultiHandler;
 use GuzzleHttp\Handler\Proxy;
+use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Promise\Promise;
-use Obs\Internal\Resource\Constants;
+use Monolog\Logger;
+use Obs\Internal\Common\Model;
+use Obs\Internal\Common\SdkCurlFactory;
+use Obs\Internal\Common\SdkStreamHandler;
+use Obs\Log\ObsLog;
 
 
 define('DEBUG', Logger::DEBUG);
@@ -164,7 +163,7 @@ if (!defined('CURLOPT_BUFFERSIZE')) {
 class ObsClient
 {
 
-    const SDK_VERSION = '3.1.3';
+    const SDK_VERSION = '3.19.9';
 
     const AclPrivate = 'private';
     const AclPublicRead = 'public-read';
@@ -307,8 +306,8 @@ class ObsClient
                 'expect' => false,
                 'handler' => HandlerStack::create($handler),
                 'curl' => [
-                    CURLOPT_BUFFERSIZE => $this->chunkSize,
-                ],
+                    CURLOPT_BUFFERSIZE => $this->chunkSize
+                ]
             ]
         );
 
