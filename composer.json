@@ -1,5 +1,5 @@
 {
-  "name": "non0/huaweicloud-obs-sdk",
+  "name": "yanlongli/huaweicloud-obs-sdk",
   "description": "华为云对象储存SDK FOR PHP",
   "license": "Apache-2.0",
   "version": "3.20.1",
@@ -20,5 +20,8 @@
     "psr-4": {
       "Obs\\": "Obs/"
     }
+  },
+  "replace": {
+    "obs/esdk-obs-php": "^3.19"
   }
 }
